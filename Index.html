@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRISM — Chughtai Healthcare | Physician Relationship Intelligence</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+:root{--navy:#1B3A6B;--teal:#0E7490;--green:#059669;--amber:#D97706;--red:#DC2626;--purple:#7C3AED;--bg:#F0F4F8;--surface:#FFF;--surface2:#F8FAFC;--border:#E2EAF2;--text:#0F172A;--text2:#475569;--text3:#94A3B8;--teal-bg:#EFF8FB;--green-bg:#ECFDF5;--amber-bg:#FFFBEB;--red-bg:#FEF2F2;--purple-bg:#F5F3FF;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.shell{display:flex;height:100vh;overflow:hidden;}
+.sidebar{width:240px;flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;overflow-y:auto;}
+.logo-wrap{padding:18px 14px 14px;border-bottom:1px solid rgba(255,255,255,.1);}
+.logo-inner{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border-radius:10px;padding:9px 12px;}
+.logo-icon{width:32px;height:32px;border-radius:7px;background:linear-gradient(135deg,#0E7490,#0EA5C9);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0;}
+.logo-text{color:#fff;font-size:14px;font-weight:700;}.logo-sub{color:rgba(255,255,255,.4);font-size:9px;letter-spacing:.8px;text-transform:uppercase;}
+.nav-section{padding:12px 10px 4px;}
+.nav-label{color:rgba(255,255,255,.3);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;padding:0 8px;margin-bottom:4px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.6);font-size:13px;font-weight:500;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;}
+.nav-item:hover{background:rgba(255,255,255,.08);color:#fff;}
+.nav-item.active{background:rgba(14,116,144,.5);color:#fff;}
+.nav-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.d-teal{background:#0EA5C9;}.d-blue{background:#60A5FA;}.d-green{background:#10B981;}
+.d-amber{background:#F59E0B;}.d-red{background:#F87171;}.d-purple{background:#A78BFA;}
+.d-crimson{background:#EF4444;}.d-gray{background:rgba(255,255,255,.35);}
+.user-bar{margin-top:auto;padding:12px 14px;border-top:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:9px;}
+.u-av{width:33px;height:33px;border-radius:50%;background:linear-gradient(135deg,#0E7490,#7C3AED);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0;}
+.u-name{color:#fff;font-size:12px;font-weight:600;}.u-role{color:rgba(255,255,255,.4);font-size:10px;}
+.main{flex:1;overflow-y:auto;background:var(--bg);}
+.screen{display:none;padding:24px;}
+.screen.active{display:block;}
+.pg-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+.pg-title{font-size:20px;font-weight:700;}.pg-sub{font-size:13px;color:var(--text2);margin-top:2px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.btn-p{background:var(--teal);color:#fff;}.btn-p:hover{background:#0c6580;}
+.btn-o{background:#fff;color:var(--text);border:1px solid var(--border);}.btn-o:hover{background:var(--bg);}
+.btn-r{background:var(--red);color:#fff;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:20px;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.s-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
+.s-val{font-size:26px;font-weight:700;line-height:1;}
+.s-d{font-size:11px;margin-top:4px;}
+.up{color:var(--green);}.dn{color:var(--red);}.warn{color:var(--amber);}
+.search-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.si{flex:1;min-width:180px;padding:9px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;}
+.si:focus{border-color:var(--teal);}
+.chip{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);}
+.chip.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+.tw{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;}
+table{width:100%;border-collapse:collapse;}
+th{background:var(--surface2);font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--surface2);}
+.dn2{font-weight:600;}.dm{font-size:11px;color:var(--text3);margin-top:2px;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+.bg{background:var(--green-bg);color:var(--green);}.ba{background:var(--amber-bg);color:var(--amber);}
+.br{background:var(--red-bg);color:var(--red);}.bt{background:var(--teal-bg);color:var(--teal);}
+.bp{background:var(--purple-bg);color:var(--purple);}.bx{background:var(--surface2);color:var(--text3);}
+.t-a{background:#FEF3C7;color:#D97706;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700;}
+.t-b{background:var(--teal-bg);color:var(--teal);border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700;}
+.t-c{background:var(--surface2);color:var(--text3);border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700;}
+.tu{color:var(--green);font-size:12px;font-weight:700;}.td{color:var(--red);font-size:12px;font-weight:700;}
+.cols{display:grid;gap:14px;}.cols2{grid-template-columns:1fr 1fr;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.ct{font-size:13px;font-weight:700;margin-bottom:12px;}
+.ph{background:linear-gradient(135deg,var(--navy),var(--teal));border-radius:12px;padding:20px;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:16px;}
+.pav{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0;}
+.pn{font-size:17px;font-weight:700;}.pr{font-size:12px;opacity:.75;margin-top:2px;}
+.pbs{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.pb2{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(255,255,255,.15);color:#fff;}
+.pb2.v{background:rgba(16,185,129,.35);}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.ci{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;}
+.cl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px;}
+.cv{font-size:13px;font-weight:600;}.cv.mo{font-family:'DM Mono',monospace;font-size:12px;}
+.tl{position:relative;padding-left:22px;}
+.tl::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--border);}
+.tli{position:relative;margin-bottom:13px;}
+.tld{position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;border:2px solid var(--surface);display:flex;align-items:center;justify-content:center;font-size:7px;}
+.tc2{background:var(--teal);color:#fff;}.tv{background:var(--green);color:#fff;}.tm{background:var(--amber);color:#fff;}.tx{background:var(--red);color:#fff;}
+.tlc{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;}
+.tlt{font-size:10px;color:var(--text3);margin-bottom:2px;}.tln{font-size:12px;font-weight:600;}.tls{font-size:11px;color:var(--text2);margin-top:2px;}
+.vf{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:18px;}
+.vs{flex:1;text-align:center;position:relative;}
+.vs::after{content:'→';position:absolute;right:-8px;top:14px;font-size:13px;color:var(--text3);}
+.vs:last-child::after{display:none;}
+.vc{width:38px;height:38px;border-radius:50%;margin:0 auto 7px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;border:2px solid transparent;}
+.vd{background:var(--green-bg);color:var(--green);border-color:var(--green);}
+.va{background:var(--teal-bg);color:var(--teal);border-color:var(--teal);}
+.vp{background:var(--surface2);color:var(--text3);border-color:var(--border);}
+.vl{font-size:11px;font-weight:700;}.vs2{font-size:10px;color:var(--text3);margin-top:2px;}
+.al{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:9px;margin-bottom:10px;}
+.al.danger{background:var(--red-bg);border:1px solid #FECACA;}
+.al.warn{background:var(--amber-bg);border:1px solid #FDE68A;}
+.al.info{background:var(--teal-bg);border:1px solid #BAE6FD;}
+.al.ok{background:var(--green-bg);border:1px solid #A7F3D0;}
+.ai{font-size:17px;flex-shrink:0;}.at{font-size:13px;font-weight:700;}.ad{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.5;}
+.nc{border:2px solid var(--teal);border-radius:14px;overflow:hidden;max-width:330px;margin:0 auto;}
+.nh{background:linear-gradient(135deg,var(--navy),var(--teal));padding:14px 16px;color:#fff;display:flex;align-items:center;gap:10px;}
+.nb{padding:16px;background:var(--surface);}
+.nr{background:var(--red-bg);border:1px solid #FECACA;border-radius:9px;padding:10px 12px;margin-bottom:12px;}
+.nr-lbl{font-size:10px;color:var(--red);font-weight:700;text-transform:uppercase;letter-spacing:.7px;}
+.nr-val{font-size:22px;font-weight:800;margin-top:2px;}.nr-nm{font-size:12px;color:var(--text2);}
+.nc-ta{font-size:12px;color:var(--text2);margin-bottom:10px;}
+.dr{border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .12s;}
+.dr:hover{background:var(--teal-bg);border-color:var(--teal);}
+.dra{width:36px;height:36px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.drn{font-size:13px;font-weight:700;}.drm{font-size:11px;color:var(--text3);}.drd{font-size:11px;color:var(--teal);font-weight:600;}
+.bc{display:flex;flex-direction:column;gap:8px;}
+.br2{display:flex;align-items:center;gap:8px;}
+.bl2{font-size:12px;color:var(--text2);width:108px;flex-shrink:0;}
+.bt2{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+.bf{height:100%;border-radius:4px;background:var(--teal);}
+.bv{font-size:12px;font-weight:700;width:36px;text-align:right;flex-shrink:0;}
+.dd{border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:11px;}
+.ddi{font-family:'DM Mono',monospace;font-size:12px;background:var(--surface2);padding:6px 10px;border-radius:6px;margin-bottom:5px;}
+.dda{text-align:center;font-size:15px;color:var(--text3);margin:4px 0;}
+.ok2{color:var(--green);font-weight:700;}.warn2{color:var(--amber);font-weight:700;}
+.dm2{background:var(--green-bg);border:1px solid #A7F3D0;border-radius:8px;padding:8px 12px;font-size:12px;color:var(--green);font-weight:600;margin-top:8px;}
+.df{background:var(--amber-bg);border:1px solid #FDE68A;border-radius:8px;padding:8px 12px;font-size:12px;color:var(--amber);font-weight:600;margin-top:8px;}
+.sec-banner{background:linear-gradient(90deg,var(--navy),var(--teal));color:#fff;border-radius:10px;padding:12px 18px;margin-bottom:18px;font-size:15px;font-weight:700;letter-spacing:.3px;}
+.who-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:10px;}
+.who-lab{background:rgba(220,38,38,.2);color:#fff;}
+.who-mgr{background:rgba(245,158,11,.2);color:#fff;}
+.who-ch{background:rgba(16,185,129,.2);color:#fff;}
+.reg-frame{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;max-width:680px;margin:0 auto;}
+.reg-header{background:#f1f5f9;border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:10px;}
+.reg-logo{font-size:13px;font-weight:700;color:var(--navy);}
+.reg-body{padding:24px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-label{font-size:12px;font-weight:600;color:var(--text2);}
+.form-label span{color:var(--red);margin-left:2px;}
+.form-input{padding:9px 12px;border-radius:8px;border:1px solid var(--border);font-size:13px;font-family:'DM Sans',sans-serif;background:#fff;}
+.form-input.highlight{border-color:var(--teal);background:var(--teal-bg);}
+.form-input.optional{border-style:dashed;background:#fafafa;}
+.opt-label{font-size:10px;color:var(--text3);margin-top:2px;}
+.dropdown-demo{position:relative;}
+.dd-input{padding:9px 12px;border-radius:8px;border:2px solid var(--teal);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--teal-bg);width:100%;}
+.dd-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--teal);border-radius:0 0 8px 8px;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,.1);}
+.dd-item{padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.dd-item:last-child{border-bottom:none;}.dd-item:hover{background:var(--teal-bg);}
+.dd-item-name{font-weight:600;}.dd-item-meta{font-size:11px;color:var(--text3);}
+.dd-item-badge{font-size:10px;background:var(--green-bg);color:var(--green);padding:2px 7px;border-radius:10px;font-weight:600;}
+.form-section-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.note-box{background:var(--amber-bg);border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--amber);}
+.annotation{display:flex;align-items:flex-start;gap:8px;margin-top:8px;padding:8px 10px;background:var(--teal-bg);border-radius:7px;border-left:3px solid var(--teal);}
+.ann-num{width:20px;height:20px;border-radius:50%;background:var(--teal);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.ann-text{font-size:12px;color:var(--text2);}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="sidebar">
+  <div class="logo-wrap">
+    <div class="logo-inner">
+      <div class="logo-icon">P</div>
+      <div><div class="logo-text">PRISM</div><div class="logo-sub">Chughtai Healthcare</div></div>
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Registration (FDO)</div>
+    <button class="nav-item active" onclick="show('s0')"><span class="nav-dot d-gray"></span>LIS Portal Enhancement</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Lab & Clinical Staff</div>
+    <button class="nav-item" onclick="show('sq')"><span class="nav-dot d-teal"></span>⚡ Quick Find Doctor</button>
+    <button class="nav-item" onclick="show('s1')"><span class="nav-dot d-gray"></span>Full Registry</button>
+    <button class="nav-item" onclick="show('s2')"><span class="nav-dot d-blue"></span>Physician Profile</button>
+    <button class="nav-item" onclick="show('sc')"><span class="nav-dot d-crimson"></span>🔴 Critical Result Alerts</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Coordinator & Admin</div>
+    <button class="nav-item" onclick="show('s3')"><span class="nav-dot d-gray"></span>Verification Pipeline</button>
+    <button class="nav-item" onclick="show('s7')"><span class="nav-dot d-purple"></span>Dedup Engine</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Management</div>
+    <button class="nav-item" onclick="show('s4')"><span class="nav-dot d-amber"></span>Regional Dashboard</button>
+    <button class="nav-item" onclick="show('s5')"><span class="nav-dot d-red"></span>Churn Alerts</button>
+    <button class="nav-item" onclick="show('s6')"><span class="nav-dot d-green"></span>Reverse Referral</button>
+  </div>
+  <div class="user-bar">
+    <div class="u-av">AF</div>
+    <div><div class="u-name">Amber Fida</div><div class="u-role">Country Head Operations</div></div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- S0: FDO REGISTRATION PORTAL -->
+<div id="s0" class="screen active">
+  <div class="sec-banner">FDO View — Existing LIS Registration Portal (2 Small API Enhancements)</div>
+  <div class="pg-hdr">
+    <div><div class="pg-title">LIS Registration Portal — Doctor Section</div>
+    <div class="pg-sub">FDO never opens PRISM. These 2 changes appear inside their existing registration system, connected silently via API.</div></div>
+  </div>
+  <div class="note-box"><strong>⚠ This is NOT the PRISM interface.</strong> This is the existing Chughtai registration portal — with 2 API-connected enhancements highlighted in teal. Change 1: Smart dropdown. Change 2: Optional contact number field. Both changes are minimal and non-disruptive to FDO workflow.</div>
+  <div class="reg-frame">
+    <div class="reg-header"><div class="reg-logo">Chughtai Lab — Patient Registration System</div><div style="margin-left:auto;font-size:12px;color:#64748b">FDO: Sana Ahmed &nbsp;|&nbsp; Branch: Gulberg, Lahore</div></div>
+    <div class="reg-body">
+      <div class="form-section-title">Patient Information</div>
+      <div class="form-row" style="margin-bottom:20px">
+        <div class="form-group"><div class="form-label">Patient Name <span>*</span></div><input class="form-input" value="Muhammad Bilal" readonly></div>
+        <div class="form-group"><div class="form-label">CNIC / Phone <span>*</span></div><input class="form-input" value="0321-4XXXXXX" readonly></div>
+        <div class="form-group"><div class="form-label">Age / Gender <span>*</span></div><input class="form-input" value="52 / Male" readonly></div>
+        <div class="form-group"><div class="form-label">Test Requested <span>*</span></div><input class="form-input" value="HbA1c, Fasting Glucose" readonly></div>
+      </div>
+      <div class="form-section-title" style="color:var(--teal)">Referring Doctor &nbsp;<span style="font-size:11px;font-weight:400;color:var(--teal);background:var(--teal-bg);padding:2px 8px;border-radius:10px">↗ PRISM API connected</span></div>
+      <div class="form-row">
+        <div class="form-group">
+          <div class="form-label" style="color:var(--teal)">Doctor Name <span>*</span>&nbsp;<span style="font-size:10px;font-weight:400;color:var(--teal)">[Change 1]</span></div>
+          <div class="dropdown-demo">
+            <input class="dd-input" value="Dr. Asad" readonly>
+            <div class="dd-list">
+              <div class="dd-item"><div><div class="dd-item-name">Dr. Asad Mehmood</div><div class="dd-item-meta">Endocrinologist · Gulberg, Lahore</div></div><span class="dd-item-badge">✓ Verified</span></div>
+              <div class="dd-item"><div><div class="dd-item-name">Dr. Asad Iqbal</div><div class="dd-item-meta">General Physician · DHA, Lahore</div></div><span class="dd-item-badge">✓ Verified</span></div>
+              <div class="dd-item" style="background:var(--surface2);color:var(--text3)"><div><div class="dd-item-name" style="font-weight:400;font-style:italic">Continue typing to add new doctor…</div></div></div>
+            </div>
+          </div>
+          <div class="annotation"><div class="ann-num">1</div><div class="ann-text">FDO types name → PRISM API returns matching verified profiles → FDO selects. If doctor not in system — continue typing as today. No block.</div></div>
+        </div>
+        <div class="form-group"><div class="form-label">Specialty</div><input class="form-input highlight" value="Endocrinologist" readonly><div style="font-size:10px;color:var(--teal);margin-top:3px">↗ Auto-filled from PRISM</div></div>
+      </div>
+      <div class="form-row" style="margin-top:4px">
+        <div class="form-group">
+          <div class="form-label" style="color:var(--teal)">Doctor Contact No. <span style="font-size:10px;font-weight:400;color:var(--text3)">[Change 2 — Optional]</span></div>
+          <input class="form-input optional" placeholder="Enter if on prescription — skip if not available" readonly>
+          <div class="opt-label">Optional — no error if left blank. Registration never held up for this field.</div>
+          <div class="annotation"><div class="ann-num">2</div><div class="ann-text">New field. FDO enters number if visible on prescription. Leave blank if not. Also used for consent capture (see below).</div></div>
+        </div>
+        <div class="form-group"><div class="form-label">Clinic / Hospital</div><input class="form-input highlight" value="Gulberg Medical Centre, Lahore" readonly><div style="font-size:10px;color:var(--teal);margin-top:3px">↗ Auto-filled from PRISM</div></div>
+      </div>
+      <div class="form-section-title" style="color:var(--red);margin-top:20px">Patient Consent Preferences &nbsp;<span style="font-size:11px;font-weight:400;color:var(--red);background:var(--red-bg);padding:2px 8px;border-radius:10px">Required for Critical Alerts feature</span></div>
+      <div style="padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:12px">May we share your critical or abnormal test results with your referring doctor to ensure faster care and follow-up?</div>
+        <div style="display:flex;gap:10px;margin-bottom:10px">
+          <div style="flex:1;padding:12px;background:var(--green-bg);border:2px solid var(--green);border-radius:9px;text-align:center;cursor:pointer">
+            <div style="font-size:14px;font-weight:700;color:var(--green)">✓ Yes, please</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:3px">Doctor will be notified of critical values</div>
+          </div>
+          <div style="flex:1;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:9px;text-align:center;cursor:pointer">
+            <div style="font-size:14px;font-weight:600;color:var(--text3)">No, keep private</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:3px">Results shared only with patient</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text3)">🔒 Consent can be changed at any time in the Chughtai app → My Preferences → Result Sharing</div>
+      </div>
+      <div style="margin-top:10px;padding:10px 14px;background:var(--green-bg);border:1px solid #A7F3D0;border-radius:9px;font-size:12px;color:var(--green)"><strong>After FDO saves:</strong> PRISM backend reads the registration silently, runs NLP on doctor name, deduplicates, and either confirms an existing verified profile or creates a draft. Consent preference is stored against this patient ID. FDO workflow is complete.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SQ: QUICK FIND DOCTOR -->
+<div id="sq" class="screen">
+  <div class="sec-banner">⚡ Lab Doctor View — Quick Contact Finder <span class="who-badge who-lab">👨‍⚕️ Lab Doctors & Pathologists · Primary daily use</span></div>
+  <div style="max-width:680px;margin:0 auto">
+    <div style="background:var(--red-bg);border:1px solid #FECACA;border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px">
+      <div style="font-size:22px;flex-shrink:0">🔬</div>
+      <div><div style="font-size:13px;font-weight:700;color:var(--red)">Active Case — Contact Needed</div><div style="font-size:12px;color:var(--text2);margin-top:2px">Case #CHG-2026-44891 · Histopathology · Waiting for clinical history before report can be finalised</div></div>
+      <div style="margin-left:auto;font-size:11px;color:var(--text3);flex-shrink:0">18 mins ago</div>
+    </div>
+    <div style="background:var(--surface);border:2px solid var(--teal);border-radius:14px;padding:18px 20px;margin-bottom:6px;box-shadow:0 4px 20px rgba(14,116,144,.12)">
+      <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Find Referring Physician</div>
+      <div style="position:relative">
+        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text3)">🔍</span>
+        <input id="qs-input" class="si" style="padding-left:42px;font-size:15px;height:48px;border-radius:10px;border:1.5px solid var(--border);width:100%" placeholder="Type doctor name, specialty or PMDC no…" oninput="quickSearch(this.value)" autocomplete="off">
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">Try: Ahmed · Asad · Cardio · Endo · PMDC-58921</div>
+    </div>
+    <div id="qs-results" style="margin-bottom:20px"></div>
+    <div id="qs-card" style="display:none">
+      <div style="background:var(--surface);border:1.5px solid var(--teal);border-radius:14px;overflow:hidden;box-shadow:0 8px 32px rgba(14,116,144,.15)">
+        <div style="background:linear-gradient(135deg,var(--navy),var(--teal));padding:18px 20px;color:#fff;display:flex;align-items:center;gap:14px">
+          <div id="qc-av" style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;flex-shrink:0"></div>
+          <div style="flex:1"><div id="qc-name" style="font-size:17px;font-weight:700"></div><div id="qc-role" style="font-size:12px;opacity:.75;margin-top:2px"></div><div id="qc-badges" style="display:flex;gap:6px;margin-top:7px;flex-wrap:wrap"></div></div>
+          <button onclick="closeCard()" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.15);border:none;cursor:pointer;color:#fff;font-size:16px;flex-shrink:0">✕</button>
+        </div>
+        <div id="qc-tier-banner" style="padding:10px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)">
+          <div id="qc-tier-icon" style="font-size:18px"></div>
+          <div><div id="qc-tier-label" style="font-size:13px;font-weight:700"></div><div id="qc-tier-sub" style="font-size:12px;color:var(--text2)"></div></div>
+          <div id="qc-response-rate" style="margin-left:auto;text-align:right;font-size:11px;color:var(--text3)"></div>
+        </div>
+        <div id="qc-contacts" style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border)"></div>
+        <div style="padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface2)">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Last Interaction</div>
+          <div id="qc-last" style="font-size:13px;color:var(--text)"></div>
+        </div>
+        <div style="padding:14px 20px;display:flex;gap:10px;flex-wrap:wrap">
+          <button style="flex:1;padding:11px 16px;background:var(--green);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">📞 Call Direct</button>
+          <button style="flex:1;padding:11px 16px;background:#25D366;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">💬 WhatsApp</button>
+          <button onclick="logContact()" style="flex:1;padding:11px 16px;background:var(--teal);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">📋 Log Contact</button>
+        </div>
+        <div id="qc-log-form" style="display:none;padding:14px 20px;background:var(--surface2);border-top:1px solid var(--border)">
+          <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px">Log This Contact</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Case ID</div><input style="width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--border);font-size:13px;font-family:'DM Sans',sans-serif" value="CHG-2026-44891"></div>
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Reached via</div><select style="width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--border);font-size:13px;font-family:'DM Sans',sans-serif"><option>Direct mobile</option><option>PA</option><option>Not reached</option></select></div>
+          </div>
+          <input style="width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--border);font-size:13px;margin-bottom:10px;font-family:'DM Sans',sans-serif" placeholder="Notes — e.g., Doctor confirmed patient has diabetes, on insulin since 3 months">
+          <button onclick="saveLog()" style="width:100%;padding:10px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Save to Interaction History</button>
+        </div>
+      </div>
+    </div>
+    <div id="qs-empty" style="text-align:center;padding:48px 20px;color:var(--text3)">
+      <div style="font-size:40px;margin-bottom:12px">🩺</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text2);margin-bottom:6px">Start typing a doctor name above</div>
+      <div style="font-size:13px">Search by name, specialty, PMDC no., or clinic</div>
+    </div>
+  </div>
+</div>
+
+<!-- S1: FULL REGISTRY -->
+<div id="s1" class="screen">
+  <div class="sec-banner">Lab Doctor View — Physician Registry <span class="who-badge who-lab">👨‍⚕️ Lab Doctors</span></div>
+  <div class="pg-hdr"><div><div class="pg-title">Physician Registry</div><div class="pg-sub">3,247 verified physicians · Avg contact retrieval: 28 seconds (was 10–15 minutes)</div></div><button class="btn btn-p">+ Add Physician</button></div>
+  <div class="stats">
+    <div class="stat"><div class="s-lbl">Total Physicians</div><div class="s-val">3,247</div><div class="s-d up">↑ 84 this month</div></div>
+    <div class="stat"><div class="s-lbl">Verified Profiles</div><div class="s-val">2,891</div><div class="s-d up">89% completeness</div></div>
+    <div class="stat"><div class="s-lbl">Pending Verification</div><div class="s-val">127</div><div class="s-d warn">14 new today</div></div>
+    <div class="stat"><div class="s-lbl">Avg Contact Time</div><div class="s-val">28s</div><div class="s-d up">↓ from 10–15 min</div></div>
+  </div>
+  <div class="search-row"><input class="si" placeholder="Search physician name, specialty, PMDC…" value="Dr. Ahmed"><span class="chip on">All regions</span><span class="chip">Lahore</span><span class="chip">Karachi</span><span class="chip on">All specialties</span></div>
+  <div class="tw"><table><thead><tr><th>Physician</th><th>Specialty</th><th>City</th><th>Tier</th><th>Referrals 30d</th><th>Trend</th><th>Contact</th><th>Status</th></tr></thead><tbody>
+    <tr onclick="show('s2')" style="cursor:pointer"><td><div class="dn2">Dr. Ahmed Butt</div><div class="dm">PMDC-42817 · Hameed Latif Hospital</div></td><td>Cardiologist</td><td>Lahore</td><td><span class="t-a">Tier A</span></td><td><strong>312</strong></td><td><span class="tu">▲ 14%</span></td><td><span class="badge bt">Direct</span></td><td><span class="badge bg">✓ PMDC Verified</span></td></tr>
+    <tr><td><div class="dn2">Dr. Ahmed Raza</div><div class="dm">PMDC-38204 · Shalamar Hospital</div></td><td>GP</td><td>Lahore</td><td><span class="t-b">Tier B</span></td><td><strong>189</strong></td><td><span class="td">▼ 8%</span></td><td><span class="badge ba">Via PA</span></td><td><span class="badge bg">✓ PMDC Verified</span></td></tr>
+    <tr><td><div class="dn2">Dr. Ahmed Khan</div><div class="dm">PMDC-71034 · Liaquat Clinic</div></td><td>Endocrinologist</td><td>Karachi</td><td><span class="t-b">Tier B</span></td><td><strong>143</strong></td><td><span class="tu">▲ 6%</span></td><td><span class="badge bt">Direct</span></td><td><span class="badge bg">✓ PMDC Verified</span></td></tr>
+    <tr><td><div class="dn2">Dr. M. Ahmed</div><div class="dm">PMDC-55219 · Poly Clinic</div></td><td>Nephrologist</td><td>Islamabad</td><td><span class="t-c">Tier C</span></td><td><strong>67</strong></td><td><span class="tu">▲ 3%</span></td><td><span class="badge bx">PA only</span></td><td><span class="badge ba">⚠ Pending</span></td></tr>
+    <tr><td><div class="dn2">Dr. Ahmed Malik</div><div class="dm">PMDC pending · DHQ Hospital</div></td><td>Oncologist</td><td>Faisalabad</td><td><span class="t-c">Tier C</span></td><td><strong>41</strong></td><td><span class="td">▼ 22%</span></td><td><span class="badge br">Unknown</span></td><td><span class="badge br">✗ Draft</span></td></tr>
+  </tbody></table></div>
+  <div style="font-size:11px;color:var(--text3);text-align:right">All 5 "Dr. Ahmed" records separated by city — no cross-city auto-merge ever occurs</div>
+</div>
+
+<!-- S2: PHYSICIAN PROFILE -->
+<div id="s2" class="screen">
+  <div class="sec-banner">Lab Doctor / Manager View — Full Physician Profile <span class="who-badge who-lab">👨‍⚕️ Lab Doctors</span><span class="who-badge who-mgr">🤝 Managers</span></div>
+  <div class="pg-hdr"><div><div class="pg-title">Dr. Ahmed Butt — Cardiologist</div><div class="pg-sub">Lahore DHA · Tier A · PMDC Verified</div></div><div style="display:flex;gap:8px"><button class="btn btn-o">📞 Log Contact</button><button class="btn btn-p">✏️ Edit</button></div></div>
+  <div class="ph"><div class="pav">AB</div><div><div class="pn">Dr. Ahmed Butt</div><div class="pr">Cardiologist · Hameed Latif Hospital · DHA Phase 5, Lahore</div><div class="pbs"><span class="pb2 v">✓ PMDC-42817 Verified</span><span class="pb2">Tier A Partner</span><span class="pb2">312 referrals / month</span><span class="pb2">9 years with Chughtai</span></div></div><div style="margin-left:auto;text-align:right;flex-shrink:0"><div style="font-size:10px;opacity:.6;margin-bottom:3px">Contact tier</div><div style="font-size:14px;font-weight:700">Tier 2 — Via PA</div><div style="font-size:11px;opacity:.6;margin-top:2px">PA: Sara Bibi · 9–5</div></div></div>
+  <div class="cg"><div class="ci"><div class="cl">Direct Mobile</div><div class="cv mo">+92-321-4XX-XXXX</div></div><div class="ci"><div class="cl">PA — Sara Bibi</div><div class="cv mo">+92-302-5XX-XXXX</div></div><div class="ci"><div class="cl">Preferred Channel</div><div class="cv"><span class="badge bt">WhatsApp · 94% response rate</span></div></div><div class="ci"><div class="cl">Last Contact</div><div class="cv">18 May 2026 · Case history · Resolved 4 min</div></div></div>
+  <div class="cols cols2">
+    <div><div class="ct">📋 Interaction History</div><div class="tl">
+      <div class="tli"><div class="tld tc2">📞</div><div class="tlc"><div class="tlt">18 May 2026 · 11:34 AM</div><div class="tln">Case history — Histo #CHG-44821</div><div class="tls">PA Sara Bibi → 4 min · Dr. Hina (Pathology)</div></div></div>
+      <div class="tli"><div class="tld tv">🤝</div><div class="tlc"><div class="tlt">2 May 2026 · Relationship visit</div><div class="tln">Monthly Tier A outreach — Lahore DHA</div><div class="tls">Eid recognition delivered · Referral trend shared</div></div></div>
+      <div class="tli"><div class="tld tm">⭐</div><div class="tlc"><div class="tlt">1 Apr 2026 · Milestone</div><div class="tln">2,500 lifetime referrals reached</div><div class="tls">Certificate dispatched · Acknowledged via WhatsApp</div></div></div>
+      <div class="tli"><div class="tld tx">🚨</div><div class="tlc"><div class="tlt">14 Mar 2026 · URGENT</div><div class="tln">Critical troponin — Tier 3 bypass triggered</div><div class="tls">PA unresponsive → direct call → 8 min</div></div></div>
+    </div></div>
+    <div><div class="ct">📊 Referral Analytics (30 days)</div><div class="bc" style="margin-bottom:14px">
+      <div class="br2"><div class="bl2">Lipid Profile</div><div class="bt2"><div class="bf" style="width:85%"></div></div><div class="bv">264</div></div>
+      <div class="br2"><div class="bl2">CBC</div><div class="bt2"><div class="bf" style="width:72%"></div></div><div class="bv">224</div></div>
+      <div class="br2"><div class="bl2">hsCRP</div><div class="bt2"><div class="bf" style="width:41%;background:var(--amber)"></div></div><div class="bv">128</div></div>
+      <div class="br2"><div class="bl2">Troponin</div><div class="bt2"><div class="bf" style="width:28%;background:var(--amber)"></div></div><div class="bv">87</div></div>
+      <div class="br2"><div class="bl2">HbA1c</div><div class="bt2"><div class="bf" style="width:8%;background:var(--red)"></div></div><div class="bv">25</div></div>
+    </div>
+    <div style="padding:10px 12px;background:var(--amber-bg);border:1px solid #FDE68A;border-radius:9px"><div style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:4px">⚠ AI Test Affinity Gap</div><div style="font-size:12px;color:var(--text2)">63% of cardiac patients show metabolic syndrome markers — HbA1c only 8% of orders. Suggested: clinical insight communication.</div></div>
+  </div></div>
+</div>
+
+<!-- SC: CRITICAL RESULTS ALERT -->
+<div id="sc" class="screen">
+  <div class="sec-banner">🔴 Critical Result Alerts — Doctor Notification with Patient Consent <span class="who-badge who-lab">👨‍⚕️ Lab Doctors · Pathologists</span></div>
+  <div class="pg-hdr">
+    <div><div class="pg-title">Critical Results — Doctor Notification Queue</div><div class="pg-sub">Results crossing clinical thresholds today · Alerts sent only where patient has consented · 18 Jun 2026</div></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span id="filter-all" class="chip on" onclick="filterAlerts('all')">All (12)</span>
+      <span id="filter-pending" class="chip" onclick="filterAlerts('pending')">Pending (5)</span>
+      <span id="filter-sent" class="chip" onclick="filterAlerts('sent')">Sent (4)</span>
+      <span id="filter-noconsent" class="chip" onclick="filterAlerts('noconsent')">No consent (3)</span>
+    </div>
+  </div>
+
+  <div style="background:var(--teal-bg);border:1px solid #BAE6FD;border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px">
+    <div style="font-size:20px;flex-shrink:0">🔒</div>
+    <div style="font-size:13px;color:var(--text2)"><strong style="color:var(--teal)">Patient consent is required before any alert is sent to a doctor.</strong> Consent is captured at registration. Patients who consented appear with a green badge — alerts can be sent. Patients who did not consent — no alert, regardless of how critical the result. Patients can update consent at any time in the Chughtai app.</div>
+  </div>
+
+  <div class="tw"><table><thead><tr><th>Patient</th><th>Test</th><th>Result</th><th>Normal range</th><th>Referring Doctor</th><th>Consent</th><th>Status</th><th>Action</th></tr></thead><tbody id="alerts-body"></tbody></table></div>
+
+  <div id="alert-modal" style="display:none;margin-top:20px">
+    <div style="background:var(--surface);border:2px solid var(--teal);border-radius:14px;overflow:hidden;max-width:620px">
+      <div style="background:linear-gradient(135deg,var(--navy),var(--teal));padding:14px 18px;color:#fff;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:15px;font-weight:700">Alert Preview — Doctor WhatsApp Notification</div>
+        <button onclick="document.getElementById('alert-modal').style.display='none'" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:4px 12px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif">✕ Close</button>
+      </div>
+      <div style="padding:18px">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Message preview — will be sent via WhatsApp to referring doctor's verified number</div>
+        <div style="background:#ECF8F2;border-radius:12px;padding:14px">
+          <div style="font-size:11px;color:#888;margin-bottom:8px">Chughtai Lab · Verified number</div>
+          <div id="alert-preview-box" style="background:#DCF8C6;border-radius:10px 10px 10px 0;padding:12px 14px;font-size:13px;line-height:1.7;color:#1A1A1A;white-space:pre-line;font-family:'DM Mono',monospace;font-size:12px"></div>
+          <div style="font-size:10px;color:#888;text-align:right;margin-top:6px">Patient consented at registration · Reply STOP to unsubscribe</div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px">
+          <button id="send-confirm-btn" onclick="confirmSend()" style="flex:1;padding:11px;background:var(--green);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">✓ Confirm & Send Alert</button>
+          <button onclick="document.getElementById('alert-modal').style.display='none'" style="flex:1;padding:11px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:9px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Cancel</button>
+        </div>
+        <div id="sent-confirm" style="display:none;margin-top:12px;padding:12px;background:var(--green-bg);border:1px solid #A7F3D0;border-radius:9px;text-align:center;font-size:13px;font-weight:700;color:var(--green)">✓ Alert sent · Logged to interaction history · Doctor notified via WhatsApp</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px">
+    <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px;padding-bottom:6px;border-bottom:2px solid var(--border)">How Consent Works End-to-End</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px">
+        <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Step 1 — At Registration</div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px">
+          <div style="font-weight:700;margin-bottom:8px">FDO asks patient:</div>
+          <div style="margin-bottom:8px;padding:8px 10px;background:var(--green-bg);border:1px solid #A7F3D0;border-radius:7px;font-size:12px">✓ Patient selected: <strong>Yes, share with my doctor</strong></div>
+          <div style="font-size:11px;color:var(--text3)">Consent stored against patient ID in PRISM. Persists for all future visits unless changed.</div>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px">
+        <div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Step 2 — Result Triggers</div>
+        <div style="background:var(--red-bg);border:1px solid #FECACA;border-radius:8px;padding:12px;font-size:12px">
+          <div style="font-weight:700;color:var(--red);margin-bottom:6px">PRISM detects critical value:</div>
+          <div>HbA1c → above 8.5%</div><div>Troponin → above 0.04 ng/mL</div><div>Histopathology → malignant flag</div><div>Creatinine → above 2.0 mg/dL</div><div>Potassium → above 6.0 mEq/L</div>
+          <div style="margin-top:8px;font-size:11px;color:var(--text3)">Checks consent before queuing alert</div>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px">
+        <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Step 3 — Doctor Receives</div>
+        <div style="background:#ECF8F2;border-radius:10px;padding:12px;font-size:12px">
+          <div style="background:#DCF8C6;border-radius:8px 8px 8px 0;padding:10px 12px;line-height:1.6;color:#1A1A1A;font-size:11px">
+            <strong>Chughtai Lab:</strong><br>
+            Dear Dr. Ahmed,<br>
+            Critical result for patient [CHG-44891] who has consented to this alert:<br>
+            <strong>HbA1c: 9.4%</strong> (Normal: &lt;5.7%)<br>
+            Status: CRITICAL<br>
+            Report: chughtailab.com/results<br>
+            Patient: 0321-XXXXXXX
+          </div>
+          <div style="font-size:10px;color:#888;margin-top:6px;text-align:center">Sent with patient consent · Opt-out: STOP</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S3: VERIFICATION PIPELINE -->
+<div id="s3" class="screen">
+  <div class="sec-banner">Backend Process — FDO Data → Verified PRISM Profile <span class="who-badge who-ch">📋 Coordinators (via WhatsApp)</span></div>
+  <div class="pg-hdr"><div><div class="pg-title">Verification Pipeline</div><div class="pg-sub">How FDO registration data flows through NLP, deduplication, and coordinator review to a verified physician profile</div></div></div>
+  <div class="vf">
+    <div class="vs"><div class="vc vd">1</div><div class="vl">FDO Entry</div><div class="vs2">Name + optional contact in LIS</div></div>
+    <div class="vs"><div class="vc vd">2</div><div class="vl">API trigger</div><div class="vs2">PRISM reads new registration</div></div>
+    <div class="vs"><div class="vc vd">3</div><div class="vl">NLP extract</div><div class="vs2">Normalizes + infers specialty + city</div></div>
+    <div class="vs"><div class="vc va">4</div><div class="vl">Dedup check</div><div class="vs2">City-first + fuzzy match</div></div>
+    <div class="vs"><div class="vc vp">5</div><div class="vl">WhatsApp verify</div><div class="vs2">Coordinator 1-tap confirm</div></div>
+    <div class="vs"><div class="vc vp">6</div><div class="vl">PMDC link</div><div class="vs2">Registration matched</div></div>
+    <div class="vs"><div class="vc vp">7</div><div class="vl">Verified ✓</div><div class="vs2">Accessible to all lab staff</div></div>
+  </div>
+  <div class="cols cols2">
+    <div><div class="ct">Pending Queue <span class="badge ba" style="margin-left:6px">47</span></div>
+    <div class="tw"><table><thead><tr><th>Raw FDO entry</th><th>NLP output</th><th>City</th><th>Score</th><th></th></tr></thead><tbody>
+      <tr><td><div class="dn2">Dr. Asad endo gulberg</div></td><td>Dr. Asad · Endocrinology · Gulberg</td><td>Lahore</td><td><span class="badge bg">94%</span></td><td><button class="btn btn-p" style="padding:4px 8px;font-size:11px">Verify</button></td></tr>
+      <tr><td><div class="dn2">ahmed sb cardio</div></td><td>Dr. Ahmed · Cardiology</td><td>Karachi</td><td><span class="badge ba">71%</span></td><td><button class="btn btn-o" style="padding:4px 8px;font-size:11px">Review</button></td></tr>
+      <tr><td><div class="dn2">Dr Nadia gynae DHA</div></td><td>Dr. Nadia · Gynaecology · DHA</td><td>Lahore</td><td><span class="badge bg">88%</span></td><td><button class="btn btn-p" style="padding:4px 8px;font-size:11px">Verify</button></td></tr>
+    </tbody></table></div></div>
+    <div><div class="ct">📱 WhatsApp Enrichment Bot</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:10px">Sent to: Coordinator — Lahore DHA</div>
+      <div style="background:#DCF8C6;border-radius:10px 10px 10px 0;padding:10px 12px;margin-bottom:8px;font-size:12px;max-width:90%"><strong>PRISM Bot (3 of 5 this week):</strong><br><br>Is Dr. Nadia Hassan at Doctors Hospital, DHA Phase 4? PA: Sara Bibi — still correct?<br><br>Reply: <strong>1</strong> Confirm &nbsp; <strong>2</strong> Update &nbsp; <strong>3</strong> Skip</div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px 10px 0 10px;padding:9px 12px;margin-left:auto;max-width:55%;font-size:13px;color:var(--green);font-weight:700;text-align:center">1 — Confirmed ✓</div>
+      <div style="margin-top:10px;padding:8px 12px;background:var(--green-bg);border:1px solid #A7F3D0;border-radius:8px;font-size:11px;color:var(--green)">Profile verified · Completeness: 91.3%</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- S4: REGIONAL DASHBOARD -->
+<div id="s4" class="screen">
+  <div class="sec-banner">Management View — Regional Intelligence Dashboard <span class="who-badge who-ch">📊 Country Head & Regional Managers</span></div>
+  <div class="pg-hdr"><div><div class="pg-title">Regional Dashboard</div><div class="pg-sub">May 2026 · All 24 regions</div></div><div style="display:flex;gap:8px"><select style="padding:7px 12px;border-radius:8px;border:1px solid var(--border);font-size:12px;font-family:'DM Sans',sans-serif"><option>All 24 regions</option><option>Lahore Central</option><option>Lahore DHA</option></select><select style="padding:7px 12px;border-radius:8px;border:1px solid var(--border);font-size:12px;font-family:'DM Sans',sans-serif"><option>All tests</option><option>HbA1c</option><option>Histopathology</option></select></div></div>
+  <div class="stats">
+    <div class="stat"><div class="s-lbl">Active Referrers</div><div class="s-val">1,847</div><div class="s-d up">↑ 43 vs last month</div></div>
+    <div class="stat"><div class="s-lbl">Referrals This Month</div><div class="s-val">48,320</div><div class="s-d up">↑ 6.2% MoM</div></div>
+    <div class="stat"><div class="s-lbl">At-Risk Physicians</div><div class="s-val" style="color:var(--red)">127</div><div class="s-d warn">⚠ AI churn flag</div></div>
+    <div class="stat"><div class="s-lbl">New This Month</div><div class="s-val">84</div><div class="s-d up">First-time referrers</div></div>
+  </div>
+  <div class="tw"><table><thead><tr><th>#</th><th>Physician</th><th>Specialty</th><th>Region</th><th>Volume 30d</th><th>vs Last Month</th><th>Status</th><th>Action</th></tr></thead><tbody>
+    <tr><td style="font-weight:700;color:var(--navy)">1</td><td><div class="dn2">Dr. Ahmed Butt</div><div class="dm">Hameed Latif</div></td><td>Cardiologist</td><td>Lahore DHA</td><td><strong>312</strong></td><td><span class="tu">▲ 14%</span></td><td><span class="badge bg">Stable</span></td><td><button class="btn btn-o" style="padding:3px 8px;font-size:11px">Strengthen</button></td></tr>
+    <tr><td style="font-weight:700;color:var(--navy)">2</td><td><div class="dn2">Dr. Sara Ahmed</div><div class="dm">Shaukat Khanum</div></td><td>Oncologist</td><td>Lahore Central</td><td><strong>267</strong></td><td><span class="tu">▲ 9%</span></td><td><span class="badge bg">Stable</span></td><td><button class="btn btn-o" style="padding:3px 8px;font-size:11px">Strengthen</button></td></tr>
+    <tr><td style="font-weight:700;color:var(--navy)">3</td><td><div class="dn2">Dr. Bilal Qureshi</div><div class="dm">Aga Khan</div></td><td>Cardiologist</td><td>Karachi</td><td><strong>198</strong></td><td><span class="td">▼ 18%</span></td><td><span class="badge br">⚠ At risk</span></td><td><button class="btn btn-r" style="padding:3px 8px;font-size:11px">Recover</button></td></tr>
+    <tr><td style="font-weight:700;color:var(--navy)">4</td><td><div class="dn2">Dr. Amna Rizvi</div><div class="dm">Islamabad Poly Clinic</div></td><td>GP</td><td>Islamabad</td><td><strong>167</strong></td><td><span class="td">▼ 35%</span></td><td><span class="badge br">⚠ At risk</span></td><td><button class="btn btn-r" style="padding:3px 8px;font-size:11px">Recover</button></td></tr>
+    <tr><td style="font-weight:700;color:var(--navy)">5</td><td><div class="dn2">Dr. Kamran Sheikh</div><div class="dm">DHQ Faisalabad</div></td><td>Endocrinologist</td><td>Faisalabad</td><td><strong>145</strong></td><td><span class="tu">▲ 22%</span></td><td><span class="badge bt">Growing</span></td><td><button class="btn btn-o" style="padding:3px 8px;font-size:11px">Develop</button></td></tr>
+  </tbody></table></div>
+</div>
+
+<!-- S5: CHURN ALERTS -->
+<div id="s5" class="screen">
+  <div class="sec-banner">AI Churn Detection — 4–6 Week Intervention Window <span class="who-badge who-ch">📊 Country Head & Regional Managers</span></div>
+  <div class="pg-hdr"><div><div class="pg-title">Churn & At-Risk Alerts</div><div class="pg-sub">AI flags declining physicians before full drop-off</div></div></div>
+  <div class="al danger"><div class="ai">🔴</div><div><div class="at">Dr. Amna Rizvi — Lahore DHA — GP</div><div class="ad">Volume: 167→119→78 (projected). 53% decline over 6 weeks. No contact in 34 days. <strong>Action: Personal call from Regional Manager within 48 hours.</strong></div></div></div>
+  <div class="al danger"><div class="ai">🔴</div><div><div class="at">Dr. Bilal Qureshi — Karachi — Cardiologist</div><div class="ad">Volume: 198→163 (18% drop). Competitor lab opened 400m away on 1 May. <strong>Action: Deliver hsCRP gap analysis.</strong></div></div></div>
+  <div class="al warn"><div class="ai">🟡</div><div><div class="at">Dr. Tariq Zaman — Lahore Central — Pathologist</div><div class="ad">Down 12% for 2 consecutive months. PA contact possibly outdated. <strong>Action: WhatsApp enrichment prompt to coordinator.</strong></div></div></div>
+  <div class="al info"><div class="ai">🔵</div><div><div class="at">Regional anomaly — Rawalpindi Saddar cluster</div><div class="ad">4 GPs showing 25–30% simultaneous decline. Likely competitive event or service issue. <strong>Action: Branch manager investigation.</strong></div></div></div>
+  <div class="al ok"><div class="ai">🟢</div><div><div class="at">Recovery confirmed — Dr. Imran Butt, Karachi</div><div class="ad">Flagged 6 weeks ago (−22%). After outreach + clinical insight report, referrals up 34% from trough. Monthly intervention success rate: 68%.</div></div></div>
+</div>
+
+<!-- S6: REVERSE REFERRAL -->
+<div id="s6" class="screen">
+  <div class="sec-banner">Disruptive Layer — Reverse Referral Engine <span class="who-badge who-ch">🏥 Clinical Team + Patient App</span></div>
+  <div class="pg-hdr"><div><div class="pg-title">Reverse Referral Engine</div><div class="pg-sub">Critical results trigger specialist recommendations to patients — with consent — via the Chughtai app</div></div></div>
+  <div class="stats">
+    <div class="stat"><div class="s-lbl">Referrals Today</div><div class="s-val">47</div><div class="s-d up">All with consent</div></div>
+    <div class="stat"><div class="s-lbl">30-Day Return Rate</div><div class="s-val">19%</div><div class="s-d up">Patients returning for follow-up</div></div>
+    <div class="stat"><div class="s-lbl">Network Physicians</div><div class="s-val">612</div><div class="s-d">Opted-in · 24 regions</div></div>
+    <div class="stat"><div class="s-lbl">Consent Rate</div><div class="s-val">78%</div><div class="s-d up">Patients accepting referral</div></div>
+  </div>
+  <div class="cols cols2">
+    <div><div class="ct">Live Triggers Today</div><div class="tw"><table><thead><tr><th>Patient</th><th>Test</th><th>Result</th><th>Threshold</th><th>Status</th></tr></thead><tbody>
+      <tr><td>CHG-44821</td><td>HbA1c</td><td style="color:var(--red);font-weight:700">9.4%</td><td>>8.5%</td><td><span class="badge bg">✓ Sent</span></td></tr>
+      <tr><td>CHG-44756</td><td>Cholesterol</td><td style="color:var(--red);font-weight:700">284 mg/dL</td><td>>240</td><td><span class="badge bg">✓ Sent</span></td></tr>
+      <tr><td>CHG-44703</td><td>Histopathology</td><td style="color:var(--red);font-weight:700">Suspicious</td><td>Flag</td><td><span class="badge ba">Consent pending</span></td></tr>
+      <tr><td>CHG-44698</td><td>TSH</td><td style="color:var(--amber);font-weight:700">11.2 mIU/L</td><td>>10</td><td><span class="badge bg">✓ Sent</span></td></tr>
+    </tbody></table></div></div>
+    <div><div class="ct">Patient App Notification</div>
+    <div class="nc"><div class="nh"><div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">C</div><div><div style="font-size:13px;font-weight:700">Chughtai Lab</div><div style="font-size:10px;opacity:.65">Your result is ready · Now</div></div></div>
+    <div class="nb"><div class="nr"><div class="nr-lbl">⚠ HbA1c Result</div><div class="nr-val">9.4%</div><div class="nr-nm">Normal: Below 5.7%</div></div>
+    <div class="nc-ta">A specialist consultation is recommended. Here are 2 doctors near you:</div>
+    <div class="dr"><div class="dra">AM</div><div style="flex:1"><div class="drn">Dr. Asad Mehmood</div><div class="drm">Endocrinologist · Gulberg</div></div><div class="drd">0.8 km</div></div>
+    <div class="dr"><div class="dra">SK</div><div style="flex:1"><div class="drn">Dr. Sana Khalid</div><div class="drm">Endocrinologist · DHA Ph.2</div></div><div class="drd">2.1 km</div></div>
+    <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:10px">🔒 With your consent · Tap to opt out</div></div></div></div>
+  </div>
+</div>
+
+<!-- S7: DEDUP ENGINE -->
+<div id="s7" class="screen">
+  <div class="sec-banner">Backend Intelligence — Deduplication Engine <span class="who-badge who-ch">📊 IT Admin · Country Head</span></div>
+  <div class="pg-hdr"><div><div class="pg-title">Deduplication Engine</div><div class="pg-sub">City-first logic prevents false merges of common Pakistani names</div></div></div>
+  <div class="cols cols2">
+    <div><div class="ct">Three Scenarios</div>
+    <div class="dd"><div style="font-size:12px;font-weight:700;margin-bottom:8px">A — Same name, different city → Never merged</div><div class="ddi">"Dr. Ahmed Khan" · Karachi branch</div><div class="ddi">"Dr. Ahmed Khan" · Lahore branch</div><div class="dda">↓ City filter: Karachi ≠ Lahore</div><div class="df">⚑ No merge — two separate profiles. Only PMDC can link them.</div></div>
+    <div class="dd"><div style="font-size:12px;font-weight:700;margin-bottom:8px">B — Variant spelling, same city → Coordinator review</div><div class="ddi">"Dr. A. Khan Cardiologist" · Lahore DHA</div><div class="ddi">"dr ahmed khan cardio" · Lahore Johar Town</div><div class="dda">↓ City match ✓ · Fuzzy score: 84% (below 88%)</div><div class="df">⚑ Sent to coordinator for WhatsApp confirmation. Not auto-merged.</div></div>
+    <div class="dd"><div style="font-size:12px;font-weight:700;margin-bottom:8px">C — PMDC confirmed → Auto-merge at 100%</div><div class="ddi">"Dr Nadia Hassan" · PMDC-67412 · Saddar</div><div class="ddi">"Dr. Nadia Hassan" · PMDC-67412 · DHA</div><div class="dda">↓ PMDC-67412 confirmed in both</div><div class="dm2">✓ Auto-merged. Single verified profile. No human input needed.</div></div></div>
+    <div><div class="ct">Common Pakistani Name Stats</div>
+    <div class="tw" style="margin-bottom:14px"><table><thead><tr><th>Name</th><th>Count</th><th>City-separated</th><th>PMDC resolved</th></tr></thead><tbody>
+      <tr><td>Dr. Ahmed/Ahmad</td><td>847</td><td><span class="badge bg">All 847</span></td><td>612</td></tr>
+      <tr><td>Dr. Khan</td><td>634</td><td><span class="badge bg">All 634</span></td><td>489</td></tr>
+      <tr><td>Dr. Ali</td><td>521</td><td><span class="badge bg">All 521</span></td><td>378</td></tr>
+      <tr><td>Dr. Hassan/Hussain</td><td>412</td><td><span class="badge bg">All 412</span></td><td>301</td></tr>
+    </tbody></table></div>
+    <div style="padding:12px 14px;background:var(--teal-bg);border:1px solid #BAE6FD;border-radius:9px;font-size:12px;color:var(--text2)"><strong style="color:var(--teal)">Design rule:</strong> City isolation is applied before any name similarity check. PMDC number is the only ground truth for automatic merging.</div></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+// ── Doctor data ────────────────────────────────────────────────
+const DOCTORS=[{id:'d1',initials:'AB',name:'Dr. Ahmed Butt',specialty:'Cardiologist',city:'Lahore',clinic:'Hameed Latif Hospital, DHA Phase 5',pmdc:'PMDC-42817',tier:2,tierLabel:'Tier 2 — Via PA',tierIcon:'📞→👩',tierColor:'#0E7490',tierBg:'#EFF8FB',tierSub:'Route through PA Sara Bibi · Office hours 9 AM – 5 PM',direct:'+92-321-4XX-XXXX',pa:'Sara Bibi · +92-302-5XX-XXXX',responseRate:'WhatsApp · 94% response rate',lastInteraction:'18 May 2026 · Case history · Resolved 4 min via PA',referrals:312,trend:'up'},{id:'d2',initials:'AM',name:'Dr. Asad Mehmood',specialty:'Endocrinologist',city:'Lahore',clinic:'Gulberg Medical Centre',pmdc:'PMDC-58921',tier:1,tierLabel:'Tier 1 — Direct',tierIcon:'📱',tierColor:'#059669',tierBg:'#ECFDF5',tierSub:'Direct mobile · Responds quickly · Prefers WhatsApp',direct:'+92-333-7XX-XXXX',pa:'No PA — direct only',responseRate:'Direct · 97%',lastInteraction:'12 May 2026 · HbA1c 9.8% case · 3 min',referrals:145,trend:'up'},{id:'d3',initials:'SA',name:'Dr. Sara Ahmed',specialty:'Oncologist',city:'Lahore',clinic:'Shaukat Khanum Cancer Hospital',pmdc:'PMDC-44107',tier:2,tierLabel:'Tier 2 — Via PA',tierIcon:'📞→👩',tierColor:'#0E7490',tierBg:'#EFF8FB',tierSub:'PA: Ms. Rabia · Office: 10 AM – 4 PM · Direct for URGENT',direct:'+92-300-6XX-XXXX (URGENT)',pa:'Ms. Rabia · +92-311-8XX-XXXX',responseRate:'PA · 88% within 2 hrs',lastInteraction:'8 May 2026 · Histo case CHG-44201',referrals:267,trend:'up'},{id:'d4',initials:'NK',name:'Dr. Nadia Khan',specialty:'General Physician',city:'Lahore',clinic:'City Clinic, Model Town',pmdc:'PMDC-71342',tier:1,tierLabel:'Tier 1 — Direct',tierIcon:'📱',tierColor:'#059669',tierBg:'#ECFDF5',tierSub:'Direct mobile · 9 AM – 7 PM · WhatsApp preferred',direct:'+92-320-5XX-XXXX',pa:'No PA',responseRate:'WhatsApp · 91% same-hour',lastInteraction:'15 May 2026 · CBC query · 2 min',referrals:189,trend:'down'},{id:'d5',initials:'TZ',name:'Dr. Tariq Zaman',specialty:'Pathologist',city:'Lahore',clinic:'Services Hospital',pmdc:'PMDC-33417',tier:3,tierLabel:'Tier 3 — Critical Bypass',tierIcon:'🚨',tierColor:'#D97706',tierBg:'#FFFBEB',tierSub:'PA first → no response 2 hrs → auto-escalate to direct',direct:'+92-42-XXXXXXX ext.214',pa:'Dept. Secretary · +92-321-9XX-XXXX',responseRate:'PA · 72% avg 4 hrs',lastInteraction:'22 Apr 2026 · Tier 3 bypass activated',referrals:98,trend:'down'},{id:'d6',initials:'HB',name:'Dr. Hina Baig',specialty:'Gynaecologist',city:'Lahore',clinic:'Doctors Hospital, DHA Phase 4',pmdc:'PMDC-61205',tier:1,tierLabel:'Tier 1 — Direct',tierIcon:'📱',tierColor:'#059669',tierBg:'#ECFDF5',tierSub:'Direct mobile · Clinic 9 AM – 2 PM',direct:'+92-321-3XX-XXXX',pa:'No PA',responseRate:'Direct · 95% same-day',lastInteraction:'16 May 2026 · CBC query · 5 min',referrals:134,trend:'up'},{id:'d7',initials:'BQ',name:'Dr. Bilal Qureshi',specialty:'Cardiologist',city:'Karachi',clinic:'Aga Khan University Hospital',pmdc:'PMDC-52890',tier:2,tierLabel:'Tier 2 — Via PA',tierIcon:'📞→👩',tierColor:'#0E7490',tierBg:'#EFF8FB',tierSub:'PA: Mr. Hamid · 11 AM – 5 PM',direct:'+92-300-4XX-XXXX',pa:'Mr. Hamid · +92-333-2XX-XXXX',responseRate:'PA · 85%',lastInteraction:'10 May 2026 · Lipid panel',referrals:198,trend:'down'},{id:'d8',initials:'KS',name:'Dr. Kamran Sheikh',specialty:'Endocrinologist',city:'Faisalabad',clinic:'DHQ Hospital Faisalabad',pmdc:'PMDC-49118',tier:1,tierLabel:'Tier 1 — Direct',tierIcon:'📱',tierColor:'#059669',tierBg:'#ECFDF5',tierSub:'Direct mobile · WhatsApp preferred',direct:'+92-333-6XX-XXXX',pa:'No PA',responseRate:'Direct · 93%',lastInteraction:'14 May 2026 · HbA1c panel',referrals:145,trend:'up'}];
+
+// ── Quick Find functions ────────────────────────────────────────
+function quickSearch(val){
+  const empty=document.getElementById('qs-empty'),results=document.getElementById('qs-results'),card=document.getElementById('qs-card');
+  card.style.display='none';
+  if(!val.trim()){results.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const q=val.toLowerCase();
+  const m=DOCTORS.filter(d=>d.name.toLowerCase().includes(q)||d.specialty.toLowerCase().includes(q)||d.city.toLowerCase().includes(q)||d.pmdc.toLowerCase().includes(q)||d.clinic.toLowerCase().includes(q));
+  if(!m.length){results.innerHTML=`<div style="text-align:center;padding:28px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text3)"><div style="font-size:24px;margin-bottom:8px">🔍</div><div style="font-size:13px;font-weight:600;color:var(--text2)">No verified profiles found for "${val}"</div><div style="font-size:12px;margin-top:4px">May be in draft queue. Contact your branch coordinator.</div></div>`;return;}
+  const tb=t=>t===1?'<span style="background:#ECFDF5;color:#059669;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Direct</span>':t===2?'<span style="background:#EFF8FB;color:#0E7490;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Via PA</span>':'<span style="background:#FFFBEB;color:#D97706;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Bypass avail.</span>';
+  const tr=t=>t==='up'?'<span style="color:#059669;font-size:11px;font-weight:700">▲</span>':'<span style="color:#DC2626;font-size:11px;font-weight:700">▼</span>';
+  results.innerHTML=m.map(d=>`<div onclick="openCard('${d.id}')" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:14px" onmouseover="this.style.borderColor='var(--teal)';this.style.background='var(--teal-bg)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)'"><div style="width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0">${d.initials}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">${d.name}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${d.specialty} · ${d.clinic}</div><div style="font-size:11px;color:var(--text3);margin-top:2px">${d.pmdc} · ${d.city} · ${tr(d.trend)} ${d.referrals} referrals/mo</div></div><div style="flex-shrink:0;text-align:right">${tb(d.tier)}<div style="font-size:11px;color:var(--teal);margin-top:6px;font-weight:600">Tap for contact →</div></div></div>`).join('');
+}
+
+function openCard(id){
+  const d=DOCTORS.find(x=>x.id===id);if(!d)return;
+  document.getElementById('qc-av').textContent=d.initials;
+  document.getElementById('qc-name').textContent=d.name;
+  document.getElementById('qc-role').textContent=d.specialty+' · '+d.clinic;
+  document.getElementById('qc-badges').innerHTML=`<span style="padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(255,255,255,.15);color:#fff">✓ ${d.pmdc}</span><span style="padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(255,255,255,.15);color:#fff">${d.city}</span>`;
+  const tb=document.getElementById('qc-tier-banner');tb.style.background=d.tierBg;
+  const tl=document.getElementById('qc-tier-label');tl.style.color=d.tierColor;tl.textContent=d.tierLabel;
+  document.getElementById('qc-tier-icon').textContent=d.tierIcon;
+  document.getElementById('qc-tier-sub').textContent=d.tierSub;
+  document.getElementById('qc-response-rate').textContent=d.responseRate;
+  document.getElementById('qc-contacts').innerHTML=`<div style="padding:14px 18px;border-right:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">Direct Mobile</div><div style="font-size:14px;font-weight:700;font-family:'DM Mono',monospace">${d.direct}</div></div><div style="padding:14px 18px"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">PA / Alternative</div><div style="font-size:13px;font-weight:600">${d.pa}</div></div>`;
+  document.getElementById('qc-last').textContent=d.lastInteraction;
+  document.getElementById('qc-log-form').style.display='none';
+  document.getElementById('qs-card').style.display='block';
+  document.getElementById('qs-results').style.display='none';
+  document.getElementById('qs-empty').style.display='none';
+}
+
+function closeCard(){document.getElementById('qs-card').style.display='none';document.getElementById('qs-results').style.display='block';}
+function logContact(){const f=document.getElementById('qc-log-form');f.style.display=f.style.display==='none'?'block':'none';}
+function saveLog(){document.getElementById('qc-log-form').innerHTML='<div style="text-align:center;padding:12px;color:var(--green);font-weight:700;font-size:13px">✓ Contact logged · Case #CHG-2026-44891 updated in interaction history</div>';}
+
+// ── Critical Alerts ────────────────────────────────────────────
+const ALERTS=[
+  {id:'a1',patient:'CHG-44891',test:'HbA1c',result:'9.4%',normal:'<5.7%',doctor:'Dr. Ahmed Butt',specialty:'Cardiologist',consent:true,status:'pending',time:'09:14 AM'},
+  {id:'a2',patient:'CHG-44756',test:'Total Cholesterol',result:'284 mg/dL',normal:'<200 mg/dL',doctor:'Dr. Asad Mehmood',specialty:'Endocrinologist',consent:true,status:'pending',time:'09:31 AM'},
+  {id:'a3',patient:'CHG-44703',test:'Histopathology',result:'Suspicious for malignancy',normal:'Benign',doctor:'Dr. Sara Ahmed',specialty:'Oncologist',consent:true,status:'sent',time:'08:52 AM'},
+  {id:'a4',patient:'CHG-44698',test:'TSH',result:'11.2 mIU/L',normal:'0.4–4.0 mIU/L',doctor:'Dr. Nadia Khan',specialty:'GP',consent:true,status:'sent',time:'10:05 AM'},
+  {id:'a5',patient:'CHG-44612',test:'Creatinine',result:'2.3 mg/dL',normal:'<1.2 mg/dL',doctor:'Dr. Bilal Qureshi',specialty:'Cardiologist',consent:false,status:'noconsent',time:'10:22 AM'},
+  {id:'a6',patient:'CHG-44589',test:'Potassium',result:'6.4 mEq/L',normal:'3.5–5.0 mEq/L',doctor:'Dr. Ahmed Butt',specialty:'Cardiologist',consent:true,status:'pending',time:'10:38 AM'},
+  {id:'a7',patient:'CHG-44571',test:'Troponin I',result:'0.84 ng/mL',normal:'<0.04 ng/mL',doctor:'Dr. Kamran Sheikh',specialty:'Endocrinologist',consent:true,status:'sent',time:'11:02 AM'},
+  {id:'a8',patient:'CHG-44543',test:'INR',result:'4.2',normal:'0.8–1.2',doctor:'Dr. Hina Baig',specialty:'Gynaecologist',consent:false,status:'noconsent',time:'11:15 AM'},
+  {id:'a9',patient:'CHG-44521',test:'Fasting Glucose',result:'398 mg/dL',normal:'70–100 mg/dL',doctor:'Dr. Nadia Khan',specialty:'GP',consent:true,status:'pending',time:'11:28 AM'},
+  {id:'a10',patient:'CHG-44498',test:'Haemoglobin',result:'5.2 g/dL',normal:'12–17 g/dL',doctor:'Dr. Ahmed Raza',specialty:'GP',consent:true,status:'sent',time:'11:44 AM'},
+  {id:'a11',patient:'CHG-44477',test:'ALT',result:'412 U/L',normal:'7–56 U/L',doctor:'Dr. Tariq Zaman',specialty:'Pathologist',consent:false,status:'noconsent',time:'12:01 PM'},
+  {id:'a12',patient:'CHG-44455',test:'HbA1c',result:'11.1%',normal:'<5.7%',doctor:'Dr. Kamran Sheikh',specialty:'Endocrinologist',consent:true,status:'pending',time:'12:18 PM'},
+];
+
+let currentAlertId=null, currentFilter='all';
+
+function renderAlerts(filter){
+  currentFilter=filter;
+  const filtered=filter==='all'?ALERTS:filter==='pending'?ALERTS.filter(a=>a.status==='pending'):filter==='sent'?ALERTS.filter(a=>a.status==='sent'):ALERTS.filter(a=>a.status==='noconsent');
+  ['all','pending','sent','noconsent'].forEach(f=>{
+    const el=document.getElementById('filter-'+f);
+    if(el) el.classList.toggle('on',f===filter);
+  });
+  const tbody=document.getElementById('alerts-body');
+  if(!tbody) return;
+  tbody.innerHTML=filtered.map(a=>{
+    const cb=a.consent?'<span class="badge bg">✓ Consented</span>':'<span class="badge br">✗ No consent</span>';
+    const sb=a.status==='sent'?'<span class="badge bg">✓ Alert sent</span>':a.status==='pending'?'<span class="badge ba">⏳ Pending</span>':'<span class="badge bx">🔒 Blocked</span>';
+    const ab=a.status==='pending'&&a.consent?`<button onclick="previewAlert('${a.id}')" style="padding:5px 12px;background:var(--red);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Send Alert</button>`:a.status==='sent'?`<span style="font-size:12px;color:var(--green);font-weight:600">Sent ${a.time}</span>`:'<span style="font-size:12px;color:var(--text3)">Cannot send</span>';
+    return `<tr><td><div class="dn2">${a.patient}</div><div class="dm">${a.time}</div></td><td>${a.test}</td><td style="color:var(--red);font-weight:700">${a.result}</td><td style="font-size:12px;color:var(--text3)">${a.normal}</td><td><div class="dn2">${a.doctor}</div><div class="dm">${a.specialty}</div></td><td>${cb}</td><td>${sb}</td><td>${ab}</td></tr>`;
+  }).join('');
+}
+
+function filterAlerts(f){renderAlerts(f);}
+
+function previewAlert(id){
+  const a=ALERTS.find(x=>x.id===id);if(!a||!a.consent)return;
+  currentAlertId=id;
+  const msg=`Dear Dr. ${a.doctor.replace('Dr. ','')},
+
+Critical result for your patient [ID: ${a.patient}] who has consented to this notification:
+
+Test: ${a.test}
+Result: ${a.result}  (Normal: ${a.normal})
+Status: CRITICAL — urgent follow-up recommended
+
+Full report: chughtailab.com/results
+Patient contact: 0321-XXXXXXX
+
+This alert was sent because the patient provided consent at registration.
+To stop receiving these: reply STOP
+
+Chughtai Healthcare · 03-111-456-789`;
+  document.getElementById('alert-preview-box').textContent=msg;
+  document.getElementById('sent-confirm').style.display='none';
+  document.getElementById('send-confirm-btn').style.display='block';
+  document.getElementById('alert-modal').style.display='block';
+  document.querySelector('.main').scrollTo(0,document.querySelector('.main').scrollHeight);
+}
+
+function confirmSend(){
+  const a=ALERTS.find(x=>x.id===currentAlertId);
+  if(a){a.status='sent';a.time=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});}
+  document.getElementById('sent-confirm').style.display='block';
+  document.getElementById('send-confirm-btn').style.display='none';
+  setTimeout(()=>{document.getElementById('alert-modal').style.display='none';renderAlerts(currentFilter);},2000);
+}
+
+// ── Navigation ────────────────────────────────────────────────
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const idx=['s0','sq','s1','s2','sc','s3','s7','s4','s5','s6'].indexOf(id);
+  document.querySelectorAll('.nav-item')[idx]?.classList.add('active');
+  document.querySelector('.main').scrollTo(0,0);
+  if(id==='sq'){
+    document.getElementById('qs-input').value='';
+    document.getElementById('qs-results').innerHTML='';
+    document.getElementById('qs-card').style.display='none';
+    document.getElementById('qs-empty').style.display='block';
+    setTimeout(()=>document.getElementById('qs-input').focus(),100);
+  }
+  if(id==='sc') renderAlerts('all');
+}
+</script>
+</body>
+</html>
